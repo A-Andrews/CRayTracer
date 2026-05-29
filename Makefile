@@ -7,7 +7,7 @@ OBJ = $(SRC:.c=.o)
 TARGET = raytracer
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) -O $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
