@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Wshadow -Werror -g -fsanitize=address -fsanitize=undefined
+CFLAGS = -std=c11 -Iinclude -Wall -Wextra -Wpedantic -Wshadow -Werror -g -fsanitize=address -fsanitize=undefined
 LDFLAGS = -fsanitize=address -fsanitize=undefined -lm
 
 SRC = $(wildcard src/*.c)
