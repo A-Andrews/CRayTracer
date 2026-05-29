@@ -18,5 +18,6 @@ double vec3_dot(Vec3 a, Vec3 b);
 Vec3 vec3_cross(Vec3 a, Vec3 b);
 Vec3 vec3_unit_vector(Vec3 a);
 double vec3_length(Vec3 a);
+void vec3_write(FILE *file, Vec3 a);
 
 #endif

@@ -1,3 +1,4 @@
+#include "vec3.h"
 #include <stdio.h>
 
 int main(void) {
@@ -20,15 +21,11 @@ int main(void) {
   for (int j = 0; j < image_height; j++) {
     printf("Lines remaining: %d\n", image_height - j);
     for (int i = 0; i < image_width; i++) {
-      double r = (double)i / (image_width - 1);
-      double g = (double)j / (image_height - 1);
-      double b = 0.0;
 
-      int ir = (int)255.999 * r;
-      int ig = (int)255.999 * g;
-      int ib = (int)255.999 * b;
-
-      fprintf(file, "%i %i %i\n", ir, ig, ib);
+      Vec3 pixel =
+          vec3_scale(255.999, (Vec3){(double)i / (image_width - 1),
+                                     (double)j / (image_height - 1), 0.0});
+      vec3_write(file, pixel);
     }
   }
 

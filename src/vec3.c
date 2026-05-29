@@ -1,5 +1,6 @@
 #include "vec3.h"
 #include <math.h>
+#include <stdio.h>
 
 Vec3 vec3_add(Vec3 a, Vec3 b) {
   return (Vec3){a.x + b.x, a.y + b.y, a.z + b.z};
@@ -30,3 +31,7 @@ Vec3 vec3_unit_vector(Vec3 a) {
 }
 
 double vec3_length(Vec3 a) { return sqrt(vec3_dot(a, a)); }
+
+void vec3_write(FILE *file, Vec3 a) {
+  fprintf(file, "%i %i %i\n", (int)a.x, (int)a.y, (int)a.z);
+}
