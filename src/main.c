@@ -3,7 +3,12 @@
 #include "vec3.h"
 #include <stdio.h>
 
-Colour ray_colour(Ray r) { return (Colour){0, 0, 0}; }
+Colour ray_colour(Ray r) {
+  Vec3 unit_direction = vec3_unit_vector(r.direction);
+  double a = 0.5 * (unit_direction.y + 1.0);
+  return vec3_add(vec3_scale(1.0 - a, (Colour){1.0, 1.0, 1.0}),
+                  vec3_scale(a, (Colour){0.5, 0.7, 1.0}));
+}
 
 int main(void) {
   // Image
@@ -18,22 +23,23 @@ int main(void) {
   // Camera
   double focal_length = 1.0;
   double viewport_height = 2.0;
-  double viewport_width = viewport_height * (double)image_width / image_height;
+  double viewport_width =
+      viewport_height * ((double)image_width / image_height);
   Vec3 camera_centre = (Point3){0, 0, 0};
 
   // Calculate horizontal and vertical vectors from viewport edges.
   Vec3 viewport_u = (Vec3){viewport_width, 0, 0};
-  Vec3 viewport_v = (Vec3){0, -image_height, 0};
+  Vec3 viewport_v = (Vec3){0, -viewport_height, 0};
 
   // Calculate delta vectors from pixel to pixel.
   Vec3 pixel_delta_u = vec3_scale(1.0 / image_width, viewport_u);
   Vec3 pixel_delta_v = vec3_scale(1.0 / image_height, viewport_v);
 
   // Calculate location of upper left pixel.
-  Point3 viewport_upper_left = vec3_sub(
-      camera_centre, vec3_add((Vec3){0, 0, focal_length},
-                              vec3_add(vec3_scale(1.0 / 2.0, viewport_v),
-                                       vec3_scale(1.0 / 2.0, viewport_u))));
+  Point3 viewport_upper_left =
+      vec3_sub(camera_centre, vec3_add((Vec3){0, 0, focal_length},
+                                       vec3_add(vec3_scale(0.5, viewport_v),
+                                                vec3_scale(0.5, viewport_u))));
   Point3 pixel00_loc =
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
@@ -53,8 +59,12 @@ int main(void) {
     printf("Lines remaining: %d\n", image_height - j);
     for (int i = 0; i < image_width; i++) {
 
-      Colour pixel_colour = (Colour){(double)i / (image_width - 1),
-                                     (double)j / (image_height - 1), 0.0};
+      Vec3 pixel_adjustment =
+          vec3_add(vec3_scale(i, pixel_delta_u), vec3_scale(j, pixel_delta_v));
+      Point3 pixel_centre = vec3_add(pixel00_loc, pixel_adjustment);
+      Vec3 ray_direction = vec3_sub(pixel_centre, camera_centre);
+      Ray ray = (Ray){camera_centre, ray_direction};
+      Colour pixel_colour = ray_colour(ray);
       write_colour(file, pixel_colour);
     }
   }
