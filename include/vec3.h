@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 typedef struct {
-  float x;
-  float y;
-  float z;
+  double x, y, z;
 } Vec3;
+
+typedef Vec3 Point3;
 
 Vec3 vec3_add(Vec3 a, Vec3 b);
 Vec3 vec3_neg(Vec3);
