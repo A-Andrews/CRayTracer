@@ -9,7 +9,7 @@ typedef struct {
 } Ray;
 
 Point3 ray_at(double t, Ray ray) {
-  return vec3_element_wise_product(ray.origin, vec3_scale(t, ray.direction));
+  return vec3_add(ray.origin, vec3_scale(t, ray.direction));
 }
 
 #endif
