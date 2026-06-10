@@ -36,10 +36,11 @@ int main(void) {
   Vec3 pixel_delta_v = vec3_scale(1.0 / image_height, viewport_v);
 
   // Calculate location of upper left pixel.
-  Point3 viewport_upper_left =
-      vec3_sub(camera_centre, vec3_add((Vec3){0, 0, focal_length},
-                                       vec3_add(vec3_scale(0.5, viewport_v),
-                                                vec3_scale(0.5, viewport_u))));
+
+  Vec3 uppel_left_direction = vec3_add(
+      (Vec3){0, 0, focal_length},
+      vec3_add(vec3_scale(0.5, viewport_v), vec3_scale(0.5, viewport_u)));
+  Point3 viewport_upper_left = vec3_sub(camera_centre, uppel_left_direction);
   Point3 pixel00_loc =
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
