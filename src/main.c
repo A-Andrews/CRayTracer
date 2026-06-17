@@ -1,18 +1,20 @@
 #include "colour.h"
+#include "hittable_list.h"
 #include "ray.h"
+#include "sphere.h"
 #include "vec3.h"
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-Colour ray_colour(Ray r) {
-  double t = hit_sphere((Point3){0, 0, -1}, 0.5, r);
-  if (t > 0.0) {
-    Vec3 N = vec3_unit_vector(vec3_sub(ray_at(t, r), (Vec3){0, 0, -1}));
-    return vec3_scale(0.5, (Colour){N.x + 1, N.y + 1, N.z + 1});
+Colour ray_colour(Ray r, HittableList world) {
+  HitRecord rec;
+  if (hit_list(&world, r, 0, INFINITY, &rec)) {
+    return vec3_scale(0.5, vec3_add(rec.normal, (Colour){1, 1, 1}));
   }
   Vec3 unit_direction = vec3_unit_vector(r.direction);
   double a = 0.5 * (unit_direction.y + 1.0);
-  return vec3_add(vec3_scale(1.0 - a, (Colour){1.0, 1.0, 1.0}),
+  return vec3_add(vec3_scale((1.0 - a), (Colour){1.0, 1.0, 1.0}),
                   vec3_scale(a, (Colour){0.5, 0.7, 1.0}));
 }
 
@@ -25,6 +27,12 @@ int main(void) {
   // Calculate image height and ensure it isn't less than 1.
   int image_height = (int)image_width / aspect_ratio;
   image_height = (image_height < 1) ? 1 : image_height;
+
+  // World
+  HittableList world = (HittableList){0};
+
+  hittable_list_add_sphere(&world, (Sphere){(Point3){0, 0, -1}, 0.5});
+  hittable_list_add_sphere(&world, (Sphere){(Point3){0, -100.5, -1}, 100});
 
   // Camera
   double focal_length = 1.0;
@@ -71,7 +79,7 @@ int main(void) {
       Point3 pixel_centre = vec3_add(pixel00_loc, pixel_adjustment);
       Vec3 ray_direction = vec3_sub(pixel_centre, camera_centre);
       Ray ray = (Ray){camera_centre, ray_direction};
-      Colour pixel_colour = ray_colour(ray);
+      Colour pixel_colour = ray_colour(ray, world);
       write_colour(file, pixel_colour);
     }
   }

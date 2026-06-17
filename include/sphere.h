@@ -1,17 +1,18 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
-#include "hittable.h"
+#include "hit_record.h"
 #include "ray.h"
 #include "vec3.h"
 #include <math.h>
+#include <stdbool.h>
 
 typedef struct {
   Point3 centre;
   double radius;
 } Sphere;
 
-bool sphere_hit(Sphere *s, Ray r, double ray_tmin, double ray_tmax,
+bool sphere_hit(const Sphere *s, Ray r, double ray_tmin, double ray_tmax,
                 HitRecord *rec) {
 
   Vec3 oc = vec3_sub(s->centre, r.origin);
