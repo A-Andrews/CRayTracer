@@ -20,6 +20,14 @@ bool interval_surrounds(const Interval i, double x) {
   return i.min < x && x < i.max;
 }
 
+double interval_clamp(const Interval i, double x) {
+  if (x < i.min)
+    return i.min;
+  if (x > i.max)
+    return i.max;
+  return x;
+}
+
 const Interval interval_empty = (Interval){INFINITY, -INFINITY};
 const Interval interval_universe = (Interval){-INFINITY, INFINITY};
 #endif

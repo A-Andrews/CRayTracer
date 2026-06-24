@@ -5,6 +5,8 @@
 #include "hit_record.h"
 #include "hittable_list.h"
 #include "interval.h"
+#include "ray.h"
+#include "rtweekend.h"
 #include "vec3.h"
 #include <math.h>
 
@@ -16,6 +18,8 @@ typedef struct {
   Vec3 pixel_delta_v;
   Point3 pixel00_loc;
   Point3 camera_centre;
+  int samples_per_pixel;
+  double pixel_samples_scale;
 } Camera;
 
 Colour camera_ray_colour(const Ray r, const HittableList *world) {
@@ -31,7 +35,25 @@ Colour camera_ray_colour(const Ray r, const HittableList *world) {
                   vec3_scale(a, (Colour){0.5, 0.7, 1.0}));
 }
 
-void camera_render(const Camera c, const HittableList *world) {
+Vec3 sample_square(void) {
+  return (Vec3){random_double() - 0.5, random_double() - 0.5, 0};
+}
+
+Ray camera_get_ray(const Camera *c, int i, int j) {
+  // construct a camera ray originating from origin and directed at randomly
+  // sampled point
+  Vec3 offset = sample_square();
+  Point3 pixel_sample = vec3_add(
+      c->pixel00_loc, vec3_add(vec3_scale(i + offset.x, c->pixel_delta_u),
+                               vec3_scale(j + offset.y, c->pixel_delta_v)));
+
+  Point3 ray_origin = c->camera_centre;
+  Vec3 ray_direction = vec3_sub(pixel_sample, ray_origin);
+
+  return (Ray){ray_origin, ray_direction};
+}
+
+void camera_render(const Camera *c, const HittableList *world) {
   FILE *file = fopen("image.ppm", "w");
 
   if (file == NULL) {
@@ -39,18 +61,17 @@ void camera_render(const Camera c, const HittableList *world) {
     return;
   }
 
-  fprintf(file, "P3\n%d %d\n255\n", c.image_width, c.image_height);
+  fprintf(file, "P3\n%d %d\n255\n", c->image_width, c->image_height);
 
-  for (int j = 0; j < c.image_height; j++) {
-    printf("Lines remaining: %d\n", c.image_height - j);
-    for (int i = 0; i < c.image_width; i++) {
+  for (int j = 0; j < c->image_height; j++) {
+    printf("Lines remaining: %d\n", c->image_height - j);
+    for (int i = 0; i < c->image_width; i++) {
 
-      Vec3 pixel_adjustment = vec3_add(vec3_scale(i, c.pixel_delta_u),
-                                       vec3_scale(j, c.pixel_delta_v));
-      Point3 pixel_centre = vec3_add(c.pixel00_loc, pixel_adjustment);
-      Vec3 ray_direction = vec3_sub(pixel_centre, c.camera_centre);
-      Ray ray = (Ray){c.camera_centre, ray_direction};
-      Colour pixel_colour = camera_ray_colour(ray, world);
+      Colour pixel_colour = (Colour){0, 0, 0};
+      for (int sample = 0; sample < c->samples_per_pixel; sample++) {
+        Ray r = camera_get_ray(c, i, j);
+        pixel_colour = vec3_add(pixel_colour, camera_ray_colour(r, world));
+      }
       write_colour(file, pixel_colour);
     }
   }
@@ -62,6 +83,8 @@ Camera camera_initialise(void) {
 
   double aspect_ratio = 16.0 / 9.0;
   int image_width = 400;
+  int samples_per_pixel = 100;
+  double pixel_samples_scale = 1.0 / samples_per_pixel;
 
   // Calculate image height and ensure it isn't less than 1.
   int image_height = (int)image_width / aspect_ratio;
@@ -91,8 +114,9 @@ Camera camera_initialise(void) {
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
 
-  return (Camera){aspect_ratio,  image_width, image_height, pixel_delta_u,
-                  pixel_delta_v, pixel00_loc, camera_centre};
+  return (Camera){aspect_ratio,  image_width,       image_height,
+                  pixel_delta_u, pixel_delta_v,     pixel00_loc,
+                  camera_centre, samples_per_pixel, pixel_samples_scale};
 }
 
 #endif

@@ -14,7 +14,7 @@ int main(void) {
   hittable_list_add_sphere(&world, (Sphere){(Point3){0, -100.5, -1}, 100});
 
   Camera camera = camera_initialise();
-  camera_render(camera, &world);
+  camera_render(&camera, &world);
 
   return 0;
 }
