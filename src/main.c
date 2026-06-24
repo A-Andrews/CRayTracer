@@ -1,5 +1,6 @@
 #include "colour.h"
 #include "hittable_list.h"
+#include "interval.h"
 #include "ray.h"
 #include "sphere.h"
 #include "vec3.h"
@@ -9,7 +10,7 @@
 
 Colour ray_colour(Ray r, HittableList world) {
   HitRecord rec;
-  if (hit_list(&world, r, 0, INFINITY, &rec)) {
+  if (hit_list(&world, r, (Interval){0, INFINITY}, &rec)) {
     return vec3_scale(0.5, vec3_add(rec.normal, (Colour){1, 1, 1}));
   }
   Vec3 unit_direction = vec3_unit_vector(r.direction);

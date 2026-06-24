@@ -2,6 +2,7 @@
 #define SPHERE_H
 
 #include "hit_record.h"
+#include "interval.h"
 #include "ray.h"
 #include "vec3.h"
 #include <math.h>
@@ -12,8 +13,7 @@ typedef struct {
   double radius;
 } Sphere;
 
-bool sphere_hit(const Sphere *s, Ray r, double ray_tmin, double ray_tmax,
-                HitRecord *rec) {
+bool sphere_hit(const Sphere *s, Ray r, Interval ray_t, HitRecord *rec) {
 
   Vec3 oc = vec3_sub(s->centre, r.origin);
   double a = pow(vec3_length(r.direction), 2);
@@ -30,9 +30,9 @@ bool sphere_hit(const Sphere *s, Ray r, double ray_tmin, double ray_tmax,
   // find nearest root in range
 
   double root = (h - sqrtd) / a;
-  if (root <= ray_tmin || ray_tmax <= root) {
+  if (!interval_surrounds(ray_t, root)) {
     root = (h + sqrtd) / a;
-    if (root <= ray_tmin || ray_tmax <= root)
+    if (!interval_surrounds(ray_t, root))
       return false;
   }
 
