@@ -1,7 +1,6 @@
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 
-#include "hit_record.h"
 #include "hittable.h"
 
 #include <memory.h>
