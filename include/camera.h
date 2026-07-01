@@ -20,14 +20,18 @@ typedef struct {
   Point3 camera_centre;
   int samples_per_pixel;
   double pixel_samples_scale;
+  int max_depth;
 } Camera;
 
-Colour camera_ray_colour(const Ray r, const HittableList *world) {
+Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
   HitRecord rec;
+  if (depth <= 0)
+    return (Colour){0, 0, 0};
 
   if (hit_list(world, r, (Interval){0, INFINITY}, &rec)) {
     Vec3 direction = vec3_random_on_hemisphere(rec.normal);
-    return vec3_scale(0.5, camera_ray_colour((Ray){rec.p, direction}, world));
+    return vec3_scale(
+        0.5, camera_ray_colour((Ray){rec.p, direction}, world, depth - 1));
   }
 
   Vec3 unit_direction = vec3_unit_vector(r.direction);
@@ -70,7 +74,8 @@ void camera_render(const Camera *c, const HittableList *world) {
       Colour pixel_colour = (Colour){0, 0, 0};
       for (int sample = 0; sample < c->samples_per_pixel; sample++) {
         Ray r = camera_get_ray(c, i, j);
-        pixel_colour = vec3_add(pixel_colour, camera_ray_colour(r, world));
+        pixel_colour =
+            vec3_add(pixel_colour, camera_ray_colour(r, world, c->max_depth));
       }
       write_colour(file, vec3_scale(c->pixel_samples_scale, pixel_colour));
     }
@@ -85,6 +90,7 @@ Camera camera_initialise(void) {
   int image_width = 400;
   int samples_per_pixel = 100;
   double pixel_samples_scale = 1.0 / samples_per_pixel;
+  int max_depth = 10;
 
   // Calculate image height and ensure it isn't less than 1.
   int image_height = (int)(image_width / aspect_ratio);
@@ -116,7 +122,8 @@ Camera camera_initialise(void) {
 
   return (Camera){aspect_ratio,  image_width,       image_height,
                   pixel_delta_u, pixel_delta_v,     pixel00_loc,
-                  camera_centre, samples_per_pixel, pixel_samples_scale};
+                  camera_centre, samples_per_pixel, pixel_samples_scale,
+                  max_depth};
 }
 
 #endif
