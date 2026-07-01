@@ -29,7 +29,8 @@ Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
     return (Colour){0, 0, 0};
 
   if (hit_list(world, r, (Interval){0.001, INFINITY}, &rec)) {
-    Vec3 direction = vec3_random_on_hemisphere(rec.normal);
+    Vec3 direction = vec3_random_on_hemisphere(
+        vec3_add(rec.normal, vec3_random_unit_vector()));
     return vec3_scale(
         0.5, camera_ray_colour((Ray){rec.p, direction}, world, depth - 1));
   }
