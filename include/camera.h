@@ -34,6 +34,7 @@ Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
     if (scatter(&r, &rec, &attenuation, &scattered))
       return vec3_element_wise_product(
           attenuation, camera_ray_colour(scattered, world, depth - 1));
+    return (Colour){0, 0, 0};
   }
 
   Vec3 unit_direction = vec3_unit_vector(r.direction);
