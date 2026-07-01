@@ -1,5 +1,7 @@
 #include "vec3.h"
+#include "rtweekend.h"
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 Vec3 vec3_add(Vec3 a, Vec3 b) {
@@ -34,4 +36,31 @@ double vec3_length(Vec3 a) { return sqrt(vec3_dot(a, a)); }
 
 void vec3_write(FILE *file, Vec3 a) {
   fprintf(file, "%i %i %i\n", (int)a.x, (int)a.y, (int)a.z);
+}
+
+Vec3 vec3_random(void) {
+  return (Vec3){random_double(), random_double(), random_double()};
+}
+
+Vec3 vec3_random_limit(double min, double max) {
+  return (Vec3){random_double_interval(min, max),
+                random_double_interval(min, max),
+                random_double_interval(min, max)};
+}
+
+Vec3 vec3_random_unit_vector(void) {
+  while (true) {
+    Vec3 p = vec3_random_limit(-1, 1);
+    double lensq = pow(vec3_length(p), 2);
+    if (1e-160 < lensq && lensq <= 1)
+      return vec3_scale(1 / sqrt(lensq), p);
+  }
+}
+
+Vec3 vec3_random_on_hemisphere(const Vec3 normal) {
+  Vec3 on_unit_sphere = vec3_random_unit_vector();
+  if (vec3_dot(on_unit_sphere, normal) > 0.0)
+    return on_unit_sphere;
+  else
+    return vec3_neg(on_unit_sphere);
 }

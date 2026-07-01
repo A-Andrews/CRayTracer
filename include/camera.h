@@ -26,7 +26,8 @@ Colour camera_ray_colour(const Ray r, const HittableList *world) {
   HitRecord rec;
 
   if (hit_list(world, r, (Interval){0, INFINITY}, &rec)) {
-    return vec3_scale(0.5, vec3_add(rec.normal, (Colour){1, 1, 1}));
+    Vec3 direction = vec3_random_on_hemisphere(rec.normal);
+    return vec3_scale(0.5, camera_ray_colour((Ray){rec.p, direction}, world));
   }
 
   Vec3 unit_direction = vec3_unit_vector(r.direction);
@@ -64,7 +65,6 @@ void camera_render(const Camera *c, const HittableList *world) {
   fprintf(file, "P3\n%d %d\n255\n", c->image_width, c->image_height);
 
   for (int j = 0; j < c->image_height; j++) {
-    printf("Lines remaining: %d\n", c->image_height - j);
     for (int i = 0; i < c->image_width; i++) {
 
       Colour pixel_colour = (Colour){0, 0, 0};

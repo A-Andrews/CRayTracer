@@ -19,5 +19,9 @@ Vec3 vec3_cross(Vec3 a, Vec3 b);
 Vec3 vec3_unit_vector(Vec3 a);
 double vec3_length(Vec3 a);
 void vec3_write(FILE *file, Vec3 a);
+Vec3 vec3_random(void);
+Vec3 vec3_random_limit(double min, double max);
+Vec3 vec3_random_unit_vector(void);
+Vec3 vec3_random_on_hemisphere(const Vec3 normal);
 
 #endif
