@@ -23,13 +23,15 @@ int main(void) {
                        (Material){.type = MATERIAL_LAMBERTIAN,
                                   .matte = (Matte){(Colour){0.1, 0.2, 0.5}}}});
   hittable_list_add_sphere(
-      &world, (Sphere){(Point3){-1.0, 0.0, -1.0}, 0.5,
-                       (Material){.type = MATERIAL_METAL,
-                                  .metal = (Metal){(Colour){0.8, 0.8, 0.8}}}});
+      &world,
+      (Sphere){(Point3){-1.0, 0.0, -1.0}, 0.5,
+               (Material){.type = MATERIAL_METAL,
+                          .metal = (Metal){(Colour){0.8, 0.8, 0.8}, 0.3}}});
   hittable_list_add_sphere(
-      &world, (Sphere){(Point3){1.0, 0.0, -1.0}, 0.5,
-                       (Material){.type = MATERIAL_METAL,
-                                  .metal = (Metal){(Colour){0.8, 0.6, 0.2}}}});
+      &world,
+      (Sphere){(Point3){1.0, 0.0, -1.0}, 0.5,
+               (Material){.type = MATERIAL_METAL,
+                          .metal = (Metal){(Colour){0.8, 0.6, 0.2}, 1.0}}});
 
   Camera camera = camera_initialise();
   camera_render(&camera, &world);

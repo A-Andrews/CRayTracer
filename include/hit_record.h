@@ -30,9 +30,11 @@ bool scatter_lambertian(const HitRecord *rec, Colour *attenuation,
 bool scatter_metal(const Ray *r_in, const HitRecord *rec, Colour *attenuation,
                    Ray *scattered, Metal m) {
   Vec3 reflected = vec3_reflect(r_in->direction, rec->normal);
+  reflected = vec3_add(vec3_unit_vector(reflected),
+                       vec3_scale(m.fuzz, vec3_random_unit_vector()));
   *scattered = ((Ray){rec->p, reflected});
   *attenuation = m.albedo;
-  return true;
+  return (vec3_dot(scattered->direction, rec->normal) > 0);
 }
 
 bool scatter(const Ray *r_in, const HitRecord *rec, Colour *attenuation,

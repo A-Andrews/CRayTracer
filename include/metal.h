@@ -6,7 +6,7 @@
 
 typedef struct {
   Colour albedo;
-
+  double fuzz;
 } Metal;
 
 #endif
