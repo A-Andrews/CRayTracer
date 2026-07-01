@@ -64,3 +64,12 @@ Vec3 vec3_random_on_hemisphere(const Vec3 normal) {
   else
     return vec3_neg(on_unit_sphere);
 }
+
+bool vec3_near_zero(const Vec3 a) {
+  double s = 1e-8;
+  return (fabs(a.x) < s) && (fabs(a.y) < s) && (fabs(a.z) < s);
+}
+
+Vec3 vec3_reflect(const Vec3 a, const Vec3 n) {
+  return vec3_sub(a, vec3_scale(2 * vec3_dot(a, n), n));
+}

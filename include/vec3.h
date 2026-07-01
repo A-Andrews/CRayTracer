@@ -1,6 +1,8 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+#include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 typedef struct {
@@ -23,5 +25,7 @@ Vec3 vec3_random(void);
 Vec3 vec3_random_limit(double min, double max);
 Vec3 vec3_random_unit_vector(void);
 Vec3 vec3_random_on_hemisphere(const Vec3 normal);
+bool vec3_near_zero(const Vec3 a);
+Vec3 vec3_reflect(const Vec3 a, const Vec3 n);
 
 #endif
