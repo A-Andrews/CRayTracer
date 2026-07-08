@@ -73,3 +73,12 @@ bool vec3_near_zero(const Vec3 a) {
 Vec3 vec3_reflect(const Vec3 a, const Vec3 n) {
   return vec3_sub(a, vec3_scale(2 * vec3_dot(a, n), n));
 }
+
+Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat) {
+  double cos_theta = min(vec3_dot(vec3_neg(uv), n), 1.0);
+  Vec3 r_out_perp =
+      vec3_scale(etai_over_etat, vec3_add(uv, vec3_scale(cos_theta, n)));
+  Vec3 r_out_parallel =
+      vec3_scale(-sqrt(fabs(1.0 - pow(vec3_length(r_out_perp), 2))), n);
+  return vec3_add(r_out_perp, r_out_parallel);
+}

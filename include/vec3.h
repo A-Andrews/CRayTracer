@@ -27,5 +27,6 @@ Vec3 vec3_random_unit_vector(void);
 Vec3 vec3_random_on_hemisphere(const Vec3 normal);
 bool vec3_near_zero(const Vec3 a);
 Vec3 vec3_reflect(const Vec3 a, const Vec3 n);
+Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat);
 
 #endif
