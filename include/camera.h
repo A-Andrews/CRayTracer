@@ -21,6 +21,7 @@ typedef struct {
   int samples_per_pixel;
   double pixel_samples_scale;
   int max_depth;
+  double vfov;
 } Camera;
 
 Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
@@ -94,6 +95,7 @@ Camera camera_initialise(void) {
   int samples_per_pixel = 100;
   double pixel_samples_scale = 1.0 / samples_per_pixel;
   int max_depth = 10;
+  double vfov = 90;
 
   // Calculate image height and ensure it isn't less than 1.
   int image_height = (int)(image_width / aspect_ratio);
@@ -101,7 +103,9 @@ Camera camera_initialise(void) {
 
   // Camera
   double focal_length = 1.0;
-  double viewport_height = 2.0;
+  double theta = degrees_to_radians(vfov);
+  double h = tan(theta / 2);
+  double viewport_height = 2.0 * h * focal_length;
   double viewport_width =
       viewport_height * ((double)image_width / image_height);
   Vec3 camera_centre = (Point3){0, 0, 0};
@@ -123,10 +127,10 @@ Camera camera_initialise(void) {
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
 
-  return (Camera){aspect_ratio,  image_width,       image_height,
-                  pixel_delta_u, pixel_delta_v,     pixel00_loc,
-                  camera_centre, samples_per_pixel, pixel_samples_scale,
-                  max_depth};
+  return (Camera){
+      aspect_ratio,        image_width, image_height,  pixel_delta_u,
+      pixel_delta_v,       pixel00_loc, camera_centre, samples_per_pixel,
+      pixel_samples_scale, max_depth,   vfov};
 }
 
 #endif
