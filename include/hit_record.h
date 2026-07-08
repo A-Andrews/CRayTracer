@@ -2,6 +2,7 @@
 #define HITRECORD_H
 
 #include "colour.h"
+#include "dielectric.h"
 #include "material.h"
 #include "ray.h"
 #include "vec3.h"
@@ -37,6 +38,18 @@ bool scatter_metal(const Ray *r_in, const HitRecord *rec, Colour *attenuation,
   return (vec3_dot(scattered->direction, rec->normal) > 0);
 }
 
+bool scatter_dielectric(const Ray *r_in, const HitRecord *rec,
+                        Colour *attenuation, Ray *scattered, Dielectric d) {
+  *attenuation = (Colour){1.0, 1.0, 1.0};
+  double ri = rec->front_face ? (1.0 / d.refraction_index) : d.refraction_index;
+
+  Vec3 unit_direction = vec3_unit_vector(r_in->direction);
+  Vec3 refracted = vec3_refract(&unit_direction, &rec->normal, ri);
+
+  *scattered = (Ray){rec->p, refracted};
+  return true;
+}
+
 bool scatter(const Ray *r_in, const HitRecord *rec, Colour *attenuation,
              Ray *scattered) {
   switch (rec->material.type) {
@@ -45,6 +58,9 @@ bool scatter(const Ray *r_in, const HitRecord *rec, Colour *attenuation,
   case MATERIAL_METAL:
     return scatter_metal(r_in, rec, attenuation, scattered,
                          rec->material.metal);
+  case MATERIAL_DIELECTRIC:
+    return scatter_dielectric(r_in, rec, attenuation, scattered,
+                              rec->material.dielectric);
   }
   return false;
 }
