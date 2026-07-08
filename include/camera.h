@@ -22,6 +22,10 @@ typedef struct {
   double pixel_samples_scale;
   int max_depth;
   double vfov;
+  Point3 lookfrom;
+  Point3 lookat;
+  Vec3 vup;
+  Vec3 u, v, w;
 } Camera;
 
 Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
@@ -97,22 +101,31 @@ Camera camera_initialise(void) {
   int max_depth = 10;
   double vfov = 90;
 
+  // Camera positioning
+  Point3 lookfrom = (Point3){-2, 2, 1};
+  Point3 lookat = (Point3){0, 0, -1};
+  Vec3 vup = (Vec3){0, 1, 0};
+
   // Calculate image height and ensure it isn't less than 1.
   int image_height = (int)(image_width / aspect_ratio);
   image_height = (image_height < 1) ? 1 : image_height;
 
   // Camera
-  double focal_length = 1.0;
+  double focal_length = vec3_length(vec3_sub(lookfrom, lookat));
   double theta = degrees_to_radians(vfov);
   double h = tan(theta / 2);
   double viewport_height = 2.0 * h * focal_length;
   double viewport_width =
       viewport_height * ((double)image_width / image_height);
-  Vec3 camera_centre = (Point3){0, 0, 0};
+  Vec3 camera_centre = lookfrom;
+
+  Vec3 w = vec3_unit_vector(vec3_sub(lookfrom, lookat));
+  Vec3 u = vec3_unit_vector(vec3_cross(vup, w));
+  Vec3 v = vec3_cross(w, u);
 
   // Calculate horizontal and vertical vectors from viewport edges.
-  Vec3 viewport_u = (Vec3){viewport_width, 0, 0};
-  Vec3 viewport_v = (Vec3){0, -viewport_height, 0};
+  Vec3 viewport_u = vec3_scale(viewport_width, u);
+  Vec3 viewport_v = vec3_scale(viewport_height, vec3_neg(v));
 
   // Calculate delta vectors from pixel to pixel.
   Vec3 pixel_delta_u = vec3_scale(1.0 / image_width, viewport_u);
@@ -120,17 +133,30 @@ Camera camera_initialise(void) {
 
   // Calculate location of upper left pixel.
   Vec3 upper_left_direction = vec3_add(
-      (Vec3){0, 0, focal_length},
+      vec3_scale(focal_length, w),
       vec3_add(vec3_scale(0.5, viewport_v), vec3_scale(0.5, viewport_u)));
   Point3 viewport_upper_left = vec3_sub(camera_centre, upper_left_direction);
   Point3 pixel00_loc =
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
 
-  return (Camera){
-      aspect_ratio,        image_width, image_height,  pixel_delta_u,
-      pixel_delta_v,       pixel00_loc, camera_centre, samples_per_pixel,
-      pixel_samples_scale, max_depth,   vfov};
+  return (Camera){aspect_ratio,
+                  image_width,
+                  image_height,
+                  pixel_delta_u,
+                  pixel_delta_v,
+                  pixel00_loc,
+                  camera_centre,
+                  samples_per_pixel,
+                  pixel_samples_scale,
+                  max_depth,
+                  vfov,
+                  lookfrom,
+                  lookat,
+                  vup,
+                  u,
+                  v,
+                  w};
 }
 
 #endif

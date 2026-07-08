@@ -38,6 +38,9 @@ int main(void) {
                           .metal = (Metal){(Colour){0.8, 0.6, 0.2}, 1.0}}});
 
   Camera camera = camera_initialise();
+  camera.lookfrom = (Point3){-2, 2, 1};
+  camera.lookat = (Point3){0, 0, -1};
+  camera.vup = (Vec3){0, 1, 0};
   camera_render(&camera, &world);
 
   return 0;

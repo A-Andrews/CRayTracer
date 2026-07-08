@@ -24,7 +24,7 @@ double vec3_dot(Vec3 a, Vec3 b) {
 }
 
 Vec3 vec3_cross(Vec3 a, Vec3 b) {
-  return (Vec3){a.y * b.z - a.z * b.y, a.x * b.z - a.z * b.x,
+  return (Vec3){a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z,
                 a.x * b.y - a.y * b.x};
 }
 
