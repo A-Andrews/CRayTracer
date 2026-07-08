@@ -26,6 +26,9 @@ typedef struct {
   Point3 lookat;
   Vec3 vup;
   Vec3 u, v, w;
+  double defocus_angle;
+  double focus_dist;
+  Vec3 defocus_disk_u, defocus_disk_v;
 } Camera;
 
 Colour camera_ray_colour(const Ray r, const HittableList *world, int depth) {
@@ -52,6 +55,13 @@ Vec3 sample_square(void) {
   return (Vec3){random_double() - 0.5, random_double() - 0.5, 0};
 }
 
+Point3 defocus_disk_sample(const Camera *c) {
+  Point3 p = vec3_random_in_unit_disk();
+  return vec3_add(
+      vec3_add(c->camera_centre, vec3_scale(p.x, c->defocus_disk_u)),
+      vec3_scale(p.y, c->defocus_disk_v));
+}
+
 Ray camera_get_ray(const Camera *c, int i, int j) {
   // construct a camera ray originating from origin and directed at randomly
   // sampled point
@@ -60,7 +70,8 @@ Ray camera_get_ray(const Camera *c, int i, int j) {
       c->pixel00_loc, vec3_add(vec3_scale(i + offset.x, c->pixel_delta_u),
                                vec3_scale(j + offset.y, c->pixel_delta_v)));
 
-  Point3 ray_origin = c->camera_centre;
+  Point3 ray_origin =
+      (c->defocus_angle <= 0) ? c->camera_centre : defocus_disk_sample(c);
   Vec3 ray_direction = vec3_sub(pixel_sample, ray_origin);
 
   return (Ray){ray_origin, ray_direction};
@@ -99,7 +110,9 @@ Camera camera_initialise(void) {
   int samples_per_pixel = 100;
   double pixel_samples_scale = 1.0 / samples_per_pixel;
   int max_depth = 10;
-  double vfov = 90;
+  double vfov = 20;
+  double defocus_angle = 10;
+  double focus_dist = 3.4;
 
   // Camera positioning
   Point3 lookfrom = (Point3){-2, 2, 1};
@@ -111,10 +124,9 @@ Camera camera_initialise(void) {
   image_height = (image_height < 1) ? 1 : image_height;
 
   // Camera
-  double focal_length = vec3_length(vec3_sub(lookfrom, lookat));
   double theta = degrees_to_radians(vfov);
   double h = tan(theta / 2);
-  double viewport_height = 2.0 * h * focal_length;
+  double viewport_height = 2.0 * h * focus_dist;
   double viewport_width =
       viewport_height * ((double)image_width / image_height);
   Vec3 camera_centre = lookfrom;
@@ -133,12 +145,17 @@ Camera camera_initialise(void) {
 
   // Calculate location of upper left pixel.
   Vec3 upper_left_direction = vec3_add(
-      vec3_scale(focal_length, w),
+      vec3_scale(focus_dist, w),
       vec3_add(vec3_scale(0.5, viewport_v), vec3_scale(0.5, viewport_u)));
   Point3 viewport_upper_left = vec3_sub(camera_centre, upper_left_direction);
   Point3 pixel00_loc =
       vec3_add(viewport_upper_left,
                vec3_scale(0.5, vec3_add(pixel_delta_u, pixel_delta_v)));
+
+  double defocus_radius =
+      focus_dist * tan(degrees_to_radians(defocus_angle / 2));
+  Vec3 defocus_disk_u = vec3_scale(defocus_radius, u);
+  Vec3 defocus_disk_v = vec3_scale(defocus_radius, v);
 
   return (Camera){aspect_ratio,
                   image_width,
@@ -156,7 +173,11 @@ Camera camera_initialise(void) {
                   vup,
                   u,
                   v,
-                  w};
+                  w,
+                  defocus_angle,
+                  focus_dist,
+                  defocus_disk_u,
+                  defocus_disk_v};
 }
 
 #endif

@@ -82,3 +82,12 @@ Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat) {
       vec3_scale(-sqrt(fabs(1.0 - pow(vec3_length(r_out_perp), 2))), *n);
   return vec3_add(r_out_perp, r_out_parallel);
 }
+
+Vec3 vec3_random_in_unit_disk(void) {
+  while (true) {
+    Vec3 p =
+        (Vec3){random_double_interval(-1, 1), random_double_interval(-1, 1), 0};
+    if (pow(vec3_length(p), 2) < 1)
+      return p;
+  }
+}
