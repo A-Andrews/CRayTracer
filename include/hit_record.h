@@ -6,6 +6,7 @@
 #include "material.h"
 #include "ray.h"
 #include "vec3.h"
+#include <math.h>
 #include <stdbool.h>
 
 typedef struct {
@@ -44,9 +45,18 @@ bool scatter_dielectric(const Ray *r_in, const HitRecord *rec,
   double ri = rec->front_face ? (1.0 / d.refraction_index) : d.refraction_index;
 
   Vec3 unit_direction = vec3_unit_vector(r_in->direction);
-  Vec3 refracted = vec3_refract(&unit_direction, &rec->normal, ri);
+  double cos_theta = fmin(vec3_dot(vec3_neg(unit_direction), rec->normal), 1.0);
+  double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
-  *scattered = (Ray){rec->p, refracted};
+  bool cannot_refract = ri * sin_theta > 1.0;
+  Vec3 direction;
+
+  if (cannot_refract)
+    direction = vec3_reflect(unit_direction, rec->normal);
+  else
+    direction = vec3_refract(&unit_direction, &rec->normal, ri);
+
+  *scattered = (Ray){rec->p, direction};
   return true;
 }
 

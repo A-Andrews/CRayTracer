@@ -26,7 +26,7 @@ int main(void) {
   hittable_list_add_sphere(
       &world, (Sphere){(Point3){-1.0, 0.0, -1.0}, 0.5,
                        (Material){.type = MATERIAL_DIELECTRIC,
-                                  .dielectric = (Dielectric){1.5}}});
+                                  .dielectric = (Dielectric){1.00 / 1.33}}});
   hittable_list_add_sphere(
       &world,
       (Sphere){(Point3){1.0, 0.0, -1.0}, 0.5,
