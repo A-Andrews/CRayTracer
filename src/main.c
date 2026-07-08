@@ -16,7 +16,7 @@ int main(void) {
   HittableList world = (HittableList){0};
 
   hittable_list_add_sphere(
-      &world, (Sphere){(Point3){0, 0, -1}, 0.5,
+      &world, (Sphere){(Point3){0, 0, -1.2}, 0.5,
                        (Material){.type = MATERIAL_LAMBERTIAN,
                                   .matte = (Matte){(Colour){0.8, 0.8, 0.0}}}});
   hittable_list_add_sphere(
@@ -26,7 +26,11 @@ int main(void) {
   hittable_list_add_sphere(
       &world, (Sphere){(Point3){-1.0, 0.0, -1.0}, 0.5,
                        (Material){.type = MATERIAL_DIELECTRIC,
-                                  .dielectric = (Dielectric){1.00 / 1.33}}});
+                                  .dielectric = (Dielectric){1.50}}});
+  hittable_list_add_sphere(
+      &world, (Sphere){(Point3){-1.0, 0.0, -1.0}, 0.4,
+                       (Material){.type = MATERIAL_DIELECTRIC,
+                                  .dielectric = (Dielectric){1.00 / 1.50}}});
   hittable_list_add_sphere(
       &world,
       (Sphere){(Point3){1.0, 0.0, -1.0}, 0.5,

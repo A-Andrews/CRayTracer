@@ -5,6 +5,7 @@
 #include "dielectric.h"
 #include "material.h"
 #include "ray.h"
+#include "rtweekend.h"
 #include "vec3.h"
 #include <math.h>
 #include <stdbool.h>
@@ -51,7 +52,7 @@ bool scatter_dielectric(const Ray *r_in, const HitRecord *rec,
   bool cannot_refract = ri * sin_theta > 1.0;
   Vec3 direction;
 
-  if (cannot_refract)
+  if (cannot_refract || reflectance(cos_theta, ri) > random_double())
     direction = vec3_reflect(unit_direction, rec->normal);
   else
     direction = vec3_refract(&unit_direction, &rec->normal, ri);
