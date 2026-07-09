@@ -106,17 +106,17 @@ void camera_render(const Camera *c, const HittableList *world) {
 Camera camera_initialise(void) {
 
   double aspect_ratio = 16.0 / 9.0;
-  int image_width = 400;
-  int samples_per_pixel = 100;
+  int image_width = 1200;
+  int samples_per_pixel = 500;
   double pixel_samples_scale = 1.0 / samples_per_pixel;
-  int max_depth = 10;
+  int max_depth = 50;
   double vfov = 20;
-  double defocus_angle = 10;
-  double focus_dist = 3.4;
+  double defocus_angle = 0.6;
+  double focus_dist = 10;
 
   // Camera positioning
-  Point3 lookfrom = (Point3){-2, 2, 1};
-  Point3 lookat = (Point3){0, 0, -1};
+  Point3 lookfrom = (Point3){13, 2, 3};
+  Point3 lookat = (Point3){0, 0, 0};
   Vec3 vup = (Vec3){0, 1, 0};
 
   // Calculate image height and ensure it isn't less than 1.
