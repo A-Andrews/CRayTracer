@@ -107,9 +107,9 @@ Camera camera_initialise(void) {
 
   double aspect_ratio = 16.0 / 9.0;
   int image_width = 1200;
-  int samples_per_pixel = 500;
+  int samples_per_pixel = 50;
   double pixel_samples_scale = 1.0 / samples_per_pixel;
-  int max_depth = 50;
+  int max_depth = 10;
   double vfov = 20;
   double defocus_angle = 0.6;
   double focus_dist = 10;
